@@ -1,77 +1,13 @@
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
 
 # 1. Konfigurasi Halaman (Wajib di paling atas)
-# --- 6. PAPAN SENYAWAMU (VERSI STABIL) ---
-st.subheader("🖼️ 2. Papan Senyawa Aktif & Informasi Unsur")
-
-# Fungsi Callback untuk mengubah jumlah
-def ubah_jumlah(idx, delta):
-    st.session_state.puzzle_comp[idx]["jumlah"] += delta
-    if st.session_state.puzzle_comp[idx]["jumlah"] <= 0:
-        st.session_state.puzzle_comp.pop(idx)
-
-if not st.session_state.puzzle_comp:
-    st.info("Papan kosong. Silakan klik unsur kimia di atas.")
-else:
-    # Gunakan container agar tata letak tidak rusak
-    container = st.container()
-    with container:
-        # Menghitung BM di sini
-        total_bm = 0.0
-        rumus_visual = ""
-        rincian_data = []
-        SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-
-        # Layout grid menggunakan columns yang tetap (misal 8 kolom)
-        papan_kolom = st.columns(8)
-        
-        for idx, item in enumerate(st.session_state.puzzle_comp):
-            unsur = item["unsur"]
-            jumlah = item["jumlah"]
-            no_atom = ELEMENT_DATA[unsur]["No"]
-            ar = ELEMENT_DATA[unsur]["Ar"]
-            warna = ELEMENT_DATA[unsur]["color"]
-            
-            # Hitung data
-            subtotal = ar * jumlah
-            total_bm += subtotal
-            rumus_visual += f"{unsur}{str(jumlah).translate(SUB) if jumlah > 1 else ''}"
-            rincian_data.append({"Unsur": unsur, "Nomor Atom": no_atom, "Massa Atom (Ar)": ar, "Jumlah": jumlah, "Subtotal Massa": round(subtotal, 4)})
-            
-            # Tampilkan di kolom yang sesuai
-            with papan_kolom[idx % 8]:
-                st.markdown(f"""
-                <div class="element-card" style="background-color: {warna};">
-                    <div class="el-no">№ {no_atom}</div>
-                    <div class="el-sym">{unsur}</div>
-                    <div class="el-ar">Ar: {ar}</div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Gunakan on_click callback agar lebih stabil
-                c1, c2, c3 = st.columns([1, 1, 1])
-                c1.button("➖", key=f"min_{idx}", on_click=ubah_jumlah, args=(idx, -1))
-                c2.markdown(f"<p style='text-align:center;'>{jumlah}</p>", unsafe_allow_html=True)
-                c3.button("➕", key=f"plus_{idx}", on_click=ubah_jumlah, args=(idx, 1))
-
-    # Tampilkan Hasil di luar loop
-    st.markdown("---")
-    res_col1, res_col2 = st.columns([1, 2])
-    with res_col1:
-        st.success(f"### 🧪 Rumus: **{rumus_visual}**")
-        st.metric(label="Berat Molekul Total (Mr)", value=f"{round(total_bm, 4)} g/mol")
-        st.button("🗑️ Bersihkan Papan", on_click=reset_puzzle, type="primary")
-    with res_col2:
-        st.write("**📋 Kontribusi Massa:**")
-        st.dataframe(pd.DataFrame(rincian_data), hide_index=True, use_container_width=True)
 st.set_page_config(page_title="Kalkulator Senyawa Kimia", layout="wide", page_icon="🧪")
 
 st.title("🧪 Komposer Senyawa Kimia")
-st.write("Klik simbol unsur pada tabel untuk merakit senyawa kimia dan melihat detail massanya!")
+st.write("Klik kepingan puzzle unsur di bawah untuk merakit senyawa kimia!")
 
-# 2. Database Lengkap Unsur Kimia dengan Kode Warna Golongan
+# 2. Database Lengkap 118 Unsur Kimia dengan Kode Warna Golongan
 ELEMENT_DATA = {
     "H": {"No": 1, "Ar": 1.008, "color": "#3A96B4"},
     "He": {"No": 2, "Ar": 4.0026, "color": "#9B59B6"},
@@ -144,38 +80,6 @@ ELEMENT_DATA = {
     "Tm": {"No": 69, "Ar": 168.93, "color": "#9C27B0"},
     "Yb": {"No": 70, "Ar": 173.05, "color": "#9C27B0"},
     "Lu": {"No": 71, "Ar": 174.97, "color": "#9C27B0"},
-    "Hf": {"No": 72, "Ar": 178.49, "color": "#F1C40F"},
-    "Ta": {"No": 73, "Ar": 180.95, "color": "#F1C40F"},
-    "W":  {"No": 74, "Ar": 183.84, "color": "#F1C40F"},
-    "Re": {"No": 75, "Ar": 186.21, "color": "#F1C40F"},
-    "Os": {"No": 76, "Ar": 190.23, "color": "#F1C40F"},
-    "Ir": {"No": 77, "Ar": 192.22, "color": "#F1C40F"},
-    "Pt": {"No": 78, "Ar": 195.08, "color": "#F1C40F"},
-    "Au": {"No": 79, "Ar": 196.97, "color": "#F1C40F"},
-    "Hg": {"No": 80, "Ar": 200.59, "color": "#F1C40F"},
-    "Tl": {"No": 81, "Ar": 204.38, "color": "#BDC3C7"},
-    "Pb": {"No": 82, "Ar": 207.2,  "color": "#BDC3C7"},
-    "Bi": {"No": 83, "Ar": 208.98, "color": "#BDC3C7"},
-    "Po": {"No": 84, "Ar": 209.0,  "color": "#1ABC9C"},
-    "At": {"No": 85, "Ar": 210.0,  "color": "#2ECC71"},
-    "Rn": {"No": 86, "Ar": 222.0,  "color": "#9B59B6"},
-    "Fr": {"No": 87, "Ar": 223.0,  "color": "#E74C3C"},
-    "Ra": {"No": 88, "Ar": 226.0,  "color": "#E67E22"},
-    "Ac": {"No": 89, "Ar": 227.0, "color": "#E91E63"},
-    "Th": {"No": 90, "Ar": 232.04, "color": "#E91E63"},
-    "Pa": {"No": 91, "Ar": 231.04, "color": "#E91E63"},
-    "U": {"No": 92, "Ar": 238.03, "color": "#E91E63"},
-    "Np": {"No": 93, "Ar": 237.0, "color": "#E91E63"},
-    "Pu": {"No": 94, "Ar": 244.0, "color": "#E91E63"},
-    "Am": {"No": 95, "Ar": 243.0, "color": "#E91E63"},
-    "Cm": {"No": 96, "Ar": 247.0, "color": "#E91E63"},
-    "Bk": {"No": 97, "Ar": 247.0, "color": "#E91E63"},
-    "Cf": {"No": 98, "Ar": 251.0, "color": "#E91E63"},
-    "Es": {"No": 99, "Ar": 252.0, "color": "#E91E63"},
-    "Fm": {"No": 100, "Ar": 257.0, "color": "#E91E63"},
-    "Md": {"No": 101, "Ar": 258.0, "color": "#E91E63"},
-    "No": {"No": 102, "Ar": 259.0, "color": "#E91E63"},
-    "Lr": {"No": 103, "Ar": 262.0, "color": "#E91E63"},
     "Rf": {"No": 104, "Ar": 267.0, "color": "#F1C40F"},
     "Db": {"No": 105, "Ar": 268.0, "color": "#F1C40F"},
     "Sg": {"No": 106, "Ar": 271.0, "color": "#F1C40F"},
@@ -193,7 +97,7 @@ ELEMENT_DATA = {
     "Og": {"No": 118, "Ar": 294.0, "color": "#9B59B6"}
 }
 
-# 3. State Management
+# 3. State Management yang Aman & Stabil
 if "puzzle_comp" not in st.session_state:
     st.session_state.puzzle_comp = []
 
@@ -207,17 +111,53 @@ def tambah_unsur(unsur):
 def reset_puzzle():
     st.session_state.puzzle_comp = []
 
-# --- 4. TANGKAP INPUT DATA KLIK DARI IFRAME ---
-query_params = st.query_params
-if "click_el" in query_params:
-    clicked_element = query_params["click_el"]
-    if clicked_element in ELEMENT_DATA:
-        tambah_unsur(clicked_element)
-    st.query_params.clear()
-    st.rerun()
+# --- INJEKSI CSS STRATEGI BARU (Membidik Atribut ID Tombol Secara Presisi) ---
+css_styles = """
+<style>
+/* Hilangkan margin bawaan kolom agar muat 18 kolom tanpa patah teks */
+div[data-testid="stColumn"] {
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+}
 
-# --- 5. RENDER TABEL PERIODIK ---
-st.subheader("🧩 1. Tabel Periodik Unsur")
+/* Membidik langsung elemen tombol berdasarkan pola ID pembuka */
+button[id^="b-t-n-e-l-"] {
+    color: #FFFFFF !important;
+    font-family: 'Arial Black', Gadget, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: bold !important;
+    height: 42px !important;
+    width: 100% !important;
+    border-radius: 5px !important;
+    border: 1px solid rgba(0,0,0,0.2) !important;
+    box-shadow: inset -2px -2px 0px rgba(0,0,0,0.2), inset 2px 2px 0px rgba(255,255,255,0.2) !important;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.3) !important;
+    padding: 0px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+"""
+
+# Generasikan warna latar belakang dinamis untuk masing-masing ID unsur
+for sym, data in ELEMENT_DATA.items():
+    # Streamlit mengubah karakter key menjadi lowercase ID dengan strip khusus, kita bidik polanya
+    clean_id = sym.lower()
+    css_styles += f"""
+    button[id*="btn_el_{clean_id}"] {{
+        background-color: {data['color']} !important;
+    }}
+    button[id*="btn_el_{clean_id}"]:hover {{
+        filter: brightness(1.15) !important;
+        color: #FFFFFF !important;
+    }}
+    """
+css_styles += "</style>"
+st.markdown(css_styles, unsafe_allow_html=True)
+
+
+# --- BAGIAN 1: RENDER TABEL PERIODIK (18 KOLOM NATIVE) ---
+st.subheader("🧩 1. Tabel Periodik Unsur (Klik untuk Menambahkan)")
 
 grid_structure = [
     ["H", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "He"],
@@ -228,78 +168,85 @@ grid_structure = [
     ["Cs", "Ba", "", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn"],
     ["Fr", "Ra", "", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og"]
 ]
-lan_elements = ["La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu"]
-akt_elements = ["Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"]
 
-html_code = """
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-    body { font-family: system-ui, sans-serif; background-color: transparent; margin: 0; padding: 5px; }
-    .periodic-table { display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 4px; }
-    .row-space { grid-column: span 18; height: 12px; }
-    .cell { min-height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none !important; box-shadow: inset -2px -2px 0px rgba(0,0,0,0.15), inset 2px 2px 0px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.15); transition: all 0.1s ease; }
-    .cell-label { font-size: 12px; font-weight: bold; color: #666; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); }
-    .empty { background: transparent; box-shadow: none; border: none; pointer-events: none; }
-    .el-text { color: #FFFFFF !important; font-weight: bold; font-size: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
-    .cell:hover { filter: brightness(1.15); transform: translateY(-1px); }
-    .cell:active { transform: scale(0.94); }
-</style>
-</head>
-<body>
-<div class="periodic-table">
-"""
+# Render Grid Utama 7 Baris
+for row_idx, row in enumerate(grid_structure):
+    cols = st.columns(18)
+    for col_idx, sym in enumerate(row):
+        if sym != "":
+            with cols[col_idx]:
+                # Gunakan key lowercase yang konsisten dipetakan oleh CSS
+                if st.button(sym, key=f"btn_el_{sym.lower()}"):
+                    tambah_unsur(sym)
 
-# Render Grid Utama
-for row in grid_structure:
-    for sym in row:
-        if sym == "":
-            html_code += '<div class="cell empty"></div>'
-        else:
-            color = ELEMENT_DATA[sym]["color"]
-            html_code += f'<a href="?click_el={sym}" target="_top" class="cell" style="background-color: {color};"><span class="el-text">{sym}</span></a>'
-
-html_code += '<div class="row-space"></div>'
+st.write("") 
 
 # Render Baris Lantanida
-html_code += '<div class="cell cell-label">Lan:</div><div class="cell empty"></div>'
-for sym in lan_elements:
-    color = ELEMENT_DATA[sym]["color"]
-    html_code += f'<a href="?click_el={sym}" target="_top" class="cell" style="background-color: {color};"><span class="el-text">{sym}</span></a>'
-html_code += '<div class="cell empty"></div>'
+cols_lan = st.columns(18)
+with cols_lan[0]:
+    st.markdown("<p style='font-weight:bold; margin-top:10px; color:#555; font-size:13px;'>Lan:</p>", unsafe_allow_html=True)
+lan_elements = ["La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu"]
+for idx, sym in enumerate(lan_elements):
+    with cols_lan[idx + 2]: 
+        if st.button(sym, key=f"btn_el_{sym.lower()}"):
+            tambah_unsur(sym)
 
 # Render Baris Aktinida
-html_code += '<div class="cell cell-label">Akt:</div><div class="cell empty"></div>'
-for sym in akt_elements:
-    color = ELEMENT_DATA[sym]["color"]
-    html_code += f'<a href="?click_el={sym}" target="_top" class="cell" style="background-color: {color};"><span class="el-text">{sym}</span></a>'
-html_code += '<div class="cell empty"></div>'
+cols_akt = st.columns(18)
+with cols_akt[0]:
+    st.markdown("<p style='font-weight:bold; margin-top:10px; color:#555; font-size:13px;'>Akt:</p>", unsafe_allow_html=True)
+akt_elements = ["Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"]
+for idx, sym in enumerate(akt_elements):
+    with cols_akt[idx + 2]:
+        if st.button(sym, key=f"btn_el_{sym.lower()}"):
+            tambah_unsur(sym)
 
-html_code += "</div></body></html>"
 
-# DIUBAH ke height=460 agar baris Aktinida tidak terpotong ke bawah frame
-components.html(html_code, height=460, scrolling=False)
+# --- BAGIAN 2: LEGENDA GOLONGAN WARNA ---
+st.markdown("""
+    <style>
+    .bottom-legend-container {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+        background-color: #fdfdfd; border: 1px solid #EAEAEA; border-radius: 8px;
+        padding: 10px; margin-top: 25px; margin-bottom: 25px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: bold; color: #444; }
+    .legend-color-box { width: 16px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.15); }
+    </style>
+<div class="bottom-legend-container">
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #E74C3C;"></div>Logam Alkali</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #E67E22;"></div>Alkali Tanah</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #F1C40F;"></div>Logam Transisi</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #BDC3C7;"></div>Logam Pasca-Transisi</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #1ABC9C;"></div>Metaloid</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #3A96B4;"></div>Non-Logam Lain</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #2ECC71;"></div>Halogen</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #9B59B6;"></div>Gas Mulia</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #9C27B0;"></div>Lantanida</div>
+    <div class="legend-item"><div class="legend-color-box" style="background-color: #E91E63;"></div>Aktinida</div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
-# --- 6. PAPAN SENYAWAMU ---
-st.subheader("🖼️ 2. Papan Senyawa Aktif & Informasi Unsur")
+
+# --- BAGIAN 3: PAPAN SENYAWAMU ---
+st.subheader("🖼️ 2. Papan Senyawa Aktif")
 
 if not st.session_state.puzzle_comp:
-    st.info("Papan kosong. Silakan klik unsur kimia di atas untuk memunculkan detail kartu keterangan beserta hitungan massanya.")
+    st.info("Papan kosong. Klik kepingan puzzle unsur di atas untuk mulai merakit.")
 else:
     st.markdown("""
         <style>
         .element-card {
             border: 2px solid #222222; border-radius: 8px; padding: 8px; text-align: center;
-            color: #FFFFFF !important; box-shadow: 3px 4px 6px rgba(0,0,0,0.2);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; min-height: 110px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.4); margin-bottom: 5px;
+            color: #FFFFFF !important; box-shadow: 3px 4px 6px rgba(0,0,0,0.25);
+            font-family: 'Courier New', Courier, monospace; min-height: 105px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); margin-bottom: 5px;
         }
-        .el-no { font-size: 12px; text-align: left; margin: 0; font-weight: bold; opacity: 0.85; }
-        .el-sym { font-size: 32px; font-weight: 900; margin: -4px 0; letter-spacing: -1px; }
-        .el-ar { font-size: 11px; font-weight: bold; margin: 2px 0 0 0; opacity: 0.95; background: rgba(0,0,0,0.15); border-radius: 3px; padding: 1px 0; }
+        .el-no { font-size: 11px; text-align: left; margin: 0; font-weight: bold; opacity: 0.8; }
+        .el-sym { font-size: 28px; font-weight: 900; margin: -5px 0; }
+        .el-ar { font-size: 11px; font-weight: bold; margin: 0; opacity: 0.9; }
         </style>
     """, unsafe_allow_html=True)
     
@@ -325,18 +272,17 @@ else:
         
         rincian_data.append({
             "Unsur": unsur,
-            "Nomor Atom": no_atom,
-            "Massa Atom (Ar)": ar,
+            "Ar": ar,
             "Jumlah": jumlah,
-            "Subtotal Massa (g/mol)": round(subtotal, 4)
+            "Subtotal (g/mol)": round(subtotal, 4)
         })
         
         with papan_kolom[idx]:
             card_html = f"""
             <div class="element-card" style="background-color: {warna};">
-                <div class="el-no">№ {no_atom}</div>
+                <div class="el-no">{no_atom}</div>
                 <div class="el-sym">{unsur}</div>
-                <div class="el-ar">Ar: {ar}</div>
+                <div class="el-ar">{ar}</div>
             </div>
             """
             st.markdown(card_html, unsafe_allow_html=True)
@@ -363,5 +309,5 @@ else:
         st.button("🗑️ Bersihkan Papan", key="btn_reset", on_click=reset_puzzle, type="primary")
         
     with res_col2:
-        st.write("**📋 Kontribusi Massa & Detail Struktur Tabel:**")
+        st.write("**📋 Kontribusi Massa Molar:**")
         st.dataframe(pd.DataFrame(rincian_data), hide_index=True, use_container_width=True)
