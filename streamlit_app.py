@@ -3,6 +3,69 @@ import pandas as pd
 import streamlit.components.v1 as components
 
 # 1. Konfigurasi Halaman (Wajib di paling atas)
+# --- 6. PAPAN SENYAWAMU (VERSI STABIL) ---
+st.subheader("🖼️ 2. Papan Senyawa Aktif & Informasi Unsur")
+
+# Fungsi Callback untuk mengubah jumlah
+def ubah_jumlah(idx, delta):
+    st.session_state.puzzle_comp[idx]["jumlah"] += delta
+    if st.session_state.puzzle_comp[idx]["jumlah"] <= 0:
+        st.session_state.puzzle_comp.pop(idx)
+
+if not st.session_state.puzzle_comp:
+    st.info("Papan kosong. Silakan klik unsur kimia di atas.")
+else:
+    # Gunakan container agar tata letak tidak rusak
+    container = st.container()
+    with container:
+        # Menghitung BM di sini
+        total_bm = 0.0
+        rumus_visual = ""
+        rincian_data = []
+        SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+
+        # Layout grid menggunakan columns yang tetap (misal 8 kolom)
+        papan_kolom = st.columns(8)
+        
+        for idx, item in enumerate(st.session_state.puzzle_comp):
+            unsur = item["unsur"]
+            jumlah = item["jumlah"]
+            no_atom = ELEMENT_DATA[unsur]["No"]
+            ar = ELEMENT_DATA[unsur]["Ar"]
+            warna = ELEMENT_DATA[unsur]["color"]
+            
+            # Hitung data
+            subtotal = ar * jumlah
+            total_bm += subtotal
+            rumus_visual += f"{unsur}{str(jumlah).translate(SUB) if jumlah > 1 else ''}"
+            rincian_data.append({"Unsur": unsur, "Nomor Atom": no_atom, "Massa Atom (Ar)": ar, "Jumlah": jumlah, "Subtotal Massa": round(subtotal, 4)})
+            
+            # Tampilkan di kolom yang sesuai
+            with papan_kolom[idx % 8]:
+                st.markdown(f"""
+                <div class="element-card" style="background-color: {warna};">
+                    <div class="el-no">№ {no_atom}</div>
+                    <div class="el-sym">{unsur}</div>
+                    <div class="el-ar">Ar: {ar}</div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Gunakan on_click callback agar lebih stabil
+                c1, c2, c3 = st.columns([1, 1, 1])
+                c1.button("➖", key=f"min_{idx}", on_click=ubah_jumlah, args=(idx, -1))
+                c2.markdown(f"<p style='text-align:center;'>{jumlah}</p>", unsafe_allow_html=True)
+                c3.button("➕", key=f"plus_{idx}", on_click=ubah_jumlah, args=(idx, 1))
+
+    # Tampilkan Hasil di luar loop
+    st.markdown("---")
+    res_col1, res_col2 = st.columns([1, 2])
+    with res_col1:
+        st.success(f"### 🧪 Rumus: **{rumus_visual}**")
+        st.metric(label="Berat Molekul Total (Mr)", value=f"{round(total_bm, 4)} g/mol")
+        st.button("🗑️ Bersihkan Papan", on_click=reset_puzzle, type="primary")
+    with res_col2:
+        st.write("**📋 Kontribusi Massa:**")
+        st.dataframe(pd.DataFrame(rincian_data), hide_index=True, use_container_width=True)
 st.set_page_config(page_title="Kalkulator Senyawa Kimia", layout="wide", page_icon="🧪")
 
 st.title("🧪 Komposer Senyawa Kimia")
