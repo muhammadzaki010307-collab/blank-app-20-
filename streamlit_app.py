@@ -81,6 +81,8 @@ ELEMENT_DATA = {
     "Tm": {"No": 69, "Ar": 168.93, "color": "#9C27B0"},
     "Yb": {"No": 70, "Ar": 173.05, "color": "#9C27B0"},
     "Lu": {"No": 71, "Ar": 174.97, "color": "#9C27B0"},
+    
+    # --- UNSUR YANG SEMPAT TERLEWAT (No 72 - 88) ---
     "Hf": {"No": 72, "Ar": 178.49, "color": "#F1C40F"},
     "Ta": {"No": 73, "Ar": 180.95, "color": "#F1C40F"},
     "W":  {"No": 74, "Ar": 183.84, "color": "#F1C40F"},
@@ -98,6 +100,7 @@ ELEMENT_DATA = {
     "Rn": {"No": 86, "Ar": 222.0,  "color": "#9B59B6"},
     "Fr": {"No": 87, "Ar": 223.0,  "color": "#E74C3C"},
     "Ra": {"No": 88, "Ar": 226.0,  "color": "#E67E22"},
+    
     "Ac": {"No": 89, "Ar": 227.0, "color": "#E91E63"},
     "Th": {"No": 90, "Ar": 232.04, "color": "#E91E63"},
     "Pa": {"No": 91, "Ar": 231.04, "color": "#E91E63"},
@@ -175,9 +178,9 @@ html_code = """
 <style>
     body { font-family: system-ui, sans-serif; background-color: transparent; margin: 0; padding: 5px; }
     .periodic-table { display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 4px; }
-    .row-space { grid-column: span 18; height: 12px; }
+    .row-space { grid-column: span 18; height: 10px; }
     .cell { min-height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none !important; box-shadow: inset -2px -2px 0px rgba(0,0,0,0.15), inset 2px 2px 0px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.15); transition: all 0.1s ease; }
-    .cell-label { font-size: 12px; font-weight: bold; color: #666; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); }
+    .cell-label { font-size: 12px; font-weight: bold; color: #666; display: flex; align-items: center; justify-content: center; }
     .empty { background: transparent; box-shadow: none; border: none; pointer-events: none; }
     .el-text { color: #FFFFFF !important; font-weight: bold; font-size: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
     .cell:hover { filter: brightness(1.15); transform: translateY(-1px); }
@@ -188,7 +191,7 @@ html_code = """
 <div class="periodic-table">
 """
 
-# Render Grid Utama
+# Render Grid Utama (Aman dari KeyError)
 for row in grid_structure:
     for sym in row:
         if sym == "":
@@ -215,8 +218,7 @@ html_code += '<div class="cell empty"></div>'
 
 html_code += "</div></body></html>"
 
-# DIUBAH ke height=460 agar baris Aktinida tidak terpotong ke bawah frame
-components.html(html_code, height=460, scrolling=False)
+components.html(html_code, height=415, scrolling=False)
 
 st.markdown("---")
 
