@@ -8,7 +8,7 @@ st.set_page_config(page_title="Kalkulator Senyawa Kimia", layout="wide", page_ic
 st.title("🧪 Komposer Senyawa Kimia")
 st.write("Klik simbol unsur pada tabel untuk merakit senyawa kimia dan melihat detail massanya!")
 
-# 2. Database Lengkap 118 Unsur Kimia dengan Kode Warna Golongan
+# 2. Database Lengkap Unsur Kimia dengan Kode Warna Golongan
 ELEMENT_DATA = {
     "H": {"No": 1, "Ar": 1.008, "color": "#3A96B4"},
     "He": {"No": 2, "Ar": 4.0026, "color": "#9B59B6"},
@@ -81,6 +81,23 @@ ELEMENT_DATA = {
     "Tm": {"No": 69, "Ar": 168.93, "color": "#9C27B0"},
     "Yb": {"No": 70, "Ar": 173.05, "color": "#9C27B0"},
     "Lu": {"No": 71, "Ar": 174.97, "color": "#9C27B0"},
+    "Hf": {"No": 72, "Ar": 178.49, "color": "#F1C40F"},
+    "Ta": {"No": 73, "Ar": 180.95, "color": "#F1C40F"},
+    "W":  {"No": 74, "Ar": 183.84, "color": "#F1C40F"},
+    "Re": {"No": 75, "Ar": 186.21, "color": "#F1C40F"},
+    "Os": {"No": 76, "Ar": 190.23, "color": "#F1C40F"},
+    "Ir": {"No": 77, "Ar": 192.22, "color": "#F1C40F"},
+    "Pt": {"No": 78, "Ar": 195.08, "color": "#F1C40F"},
+    "Au": {"No": 79, "Ar": 196.97, "color": "#F1C40F"},
+    "Hg": {"No": 80, "Ar": 200.59, "color": "#F1C40F"},
+    "Tl": {"No": 81, "Ar": 204.38, "color": "#BDC3C7"},
+    "Pb": {"No": 82, "Ar": 207.2,  "color": "#BDC3C7"},
+    "Bi": {"No": 83, "Ar": 208.98, "color": "#BDC3C7"},
+    "Po": {"No": 84, "Ar": 209.0,  "color": "#1ABC9C"},
+    "At": {"No": 85, "Ar": 210.0,  "color": "#2ECC71"},
+    "Rn": {"No": 86, "Ar": 222.0,  "color": "#9B59B6"},
+    "Fr": {"No": 87, "Ar": 223.0,  "color": "#E74C3C"},
+    "Ra": {"No": 88, "Ar": 226.0,  "color": "#E67E22"},
     "Ac": {"No": 89, "Ar": 227.0, "color": "#E91E63"},
     "Th": {"No": 90, "Ar": 232.04, "color": "#E91E63"},
     "Pa": {"No": 91, "Ar": 231.04, "color": "#E91E63"},
@@ -136,7 +153,7 @@ if "click_el" in query_params:
     st.query_params.clear()
     st.rerun()
 
-# --- 5. RENDER TABEL PERIODIK MINIMALIS (Tanpa Legenda Bawah) ---
+# --- 5. RENDER TABEL PERIODIK ---
 st.subheader("🧩 1. Tabel Periodik Unsur")
 
 grid_structure = [
@@ -158,9 +175,9 @@ html_code = """
 <style>
     body { font-family: system-ui, sans-serif; background-color: transparent; margin: 0; padding: 5px; }
     .periodic-table { display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 4px; }
-    .row-space { grid-column: span 18; height: 10px; }
+    .row-space { grid-column: span 18; height: 12px; }
     .cell { min-height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none !important; box-shadow: inset -2px -2px 0px rgba(0,0,0,0.15), inset 2px 2px 0px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.15); transition: all 0.1s ease; }
-    .cell-label { font-size: 12px; font-weight: bold; color: #666; display: flex; align-items: center; justify-content: center; }
+    .cell-label { font-size: 12px; font-weight: bold; color: #666; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); }
     .empty { background: transparent; box-shadow: none; border: none; pointer-events: none; }
     .el-text { color: #FFFFFF !important; font-weight: bold; font-size: 15px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-shadow: 1px 1px 1px rgba(0,0,0,0.2); }
     .cell:hover { filter: brightness(1.15); transform: translateY(-1px); }
@@ -198,7 +215,8 @@ html_code += '<div class="cell empty"></div>'
 
 html_code += "</div></body></html>"
 
-components.html(html_code, height=415, scrolling=False)
+# DIUBAH ke height=460 agar baris Aktinida tidak terpotong ke bawah frame
+components.html(html_code, height=460, scrolling=False)
 
 st.markdown("---")
 
